@@ -27,9 +27,9 @@ const EmptyBoards = () => {
         title: "Untitled",
       },
       {
-        onSuccess: (data) => {
+        onSuccess: (id) => {
           toast.success("Board created");
-          router.push(`/boards/${data}`);
+          router.push(`/board/${id}`);
         },
         onError: () => {
           toast.error("Failed to create a board");
