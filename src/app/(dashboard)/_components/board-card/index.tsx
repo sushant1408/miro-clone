@@ -6,10 +6,13 @@ import Link from "next/link";
 
 import { BoardActions } from "@/components/board-actions";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useApiMutation } from "@/hooks/use-api-mutation";
 import { useConfirm } from "@/hooks/use-confirm";
+import { api } from "../../../../../convex/_generated/api";
 import { Doc } from "../../../../../convex/_generated/dataModel";
 import { Footer } from "./footer";
 import { Overlay } from "./overlay";
+import { toast } from "sonner";
 
 interface BoardCardProps {
   id: Doc<"boards">["_id"];
@@ -37,12 +40,38 @@ const BoardCard = ({
     message: "This will delete the board and al of its contents.",
     title: "Delete board?",
   });
+  const { isPending: isFavoriteBoardPending, mutate: favoriteBoard } =
+    useApiMutation(api.board.favorite);
+  const { isPending: isUnfavoriteBoardPending, mutate: unfavoriteBoard } =
+    useApiMutation(api.board.unfavorite);
 
   const authorLabel = userId === authorId ? "You" : authorName;
   const createdAtLabel = formatDistanceToNow(createdAt, { addSuffix: true });
 
   const onConfirm = async () => {
     return await confirm();
+  };
+
+  const toggleFavorite = () => {
+    if (isFavorite) {
+      unfavoriteBoard(
+        { id },
+        {
+          onError: () => {
+            toast.error("Failed to unfavorite");
+          },
+        }
+      );
+    } else {
+      favoriteBoard(
+        { id },
+        {
+          onError: () => {
+            toast.error("Failed to favorite");
+          },
+        }
+      );
+    }
   };
 
   return (
@@ -69,8 +98,8 @@ const BoardCard = ({
             title={title}
             authorLabel={authorLabel}
             createdAtLabel={createdAtLabel}
-            onClick={() => {}}
-            disabled={false}
+            onClick={toggleFavorite}
+            disabled={isFavoriteBoardPending || isUnfavoriteBoardPending}
           />
         </div>
       </Link>
