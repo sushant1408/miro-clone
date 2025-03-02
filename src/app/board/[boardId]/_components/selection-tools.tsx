@@ -1,15 +1,15 @@
 "use client";
 
 import { useMutation, useSelf } from "@liveblocks/react";
+import { BringToFrontIcon, SendToBackIcon, Trash2Icon } from "lucide-react";
 import { memo } from "react";
 
+import { TooltipWrapper } from "@/components/tooltip-wrapper";
+import { Button } from "@/components/ui/button";
+import { useDeleteLayers } from "@/hooks/use-delete-layers";
 import { useSelectionBounds } from "@/hooks/use-selection-bounds";
 import { Camera, Color } from "@/types/canvas";
 import { ColorPicker } from "./color-picker";
-import { useDeleteLayers } from "@/hooks/use-delete-layers";
-import { TooltipWrapper } from "@/components/tooltip-wrapper";
-import { Button } from "@/components/ui/button";
-import { Trash2Icon } from "lucide-react";
 
 interface SelectionToolsProps {
   camera: Camera;
@@ -19,6 +19,49 @@ interface SelectionToolsProps {
 const SelectionTools = memo(
   ({ camera, setLastUsedColor }: SelectionToolsProps) => {
     const selection = useSelf((me) => me.presence.selection) || [];
+
+    const moveToBack = useMutation(
+      ({ storage }) => {
+        const liveLayerIds = storage.get("layerIds");
+        const indeces: number[] = [];
+
+        const arr = liveLayerIds.toArray();
+
+        for (let i = 0; i < arr.length; i++) {
+          if (selection.includes(arr[i])) {
+            indeces.push(i);
+          }
+        }
+
+        for (let i = 0; i < indeces.length; i++) {
+          liveLayerIds.move(indeces[i], i);
+        }
+      },
+      [selection]
+    );
+
+    const moveToFront = useMutation(
+      ({ storage }) => {
+        const liveLayerIds = storage.get("layerIds");
+        const indeces: number[] = [];
+
+        const arr = liveLayerIds.toArray();
+
+        for (let i = 0; i < arr.length; i++) {
+          if (selection.includes(arr[i])) {
+            indeces.push(i);
+          }
+        }
+
+        for (let i = indeces.length - 1; i >= 0; i--) {
+          liveLayerIds.move(
+            indeces[i],
+            arr.length - 1 - (indeces.length - 1 - i)
+          );
+        }
+      },
+      [selection]
+    );
 
     const setFill = useMutation(
       ({ storage }, fill: Color) => {
@@ -55,6 +98,18 @@ const SelectionTools = memo(
         }}
       >
         <ColorPicker onChange={setFill} />
+        <div className="flex flex-col gap-y-0.5">
+          <TooltipWrapper label="Bring to front">
+            <Button variant="board" size="icon" onClick={moveToFront}>
+              <BringToFrontIcon />
+            </Button>
+          </TooltipWrapper>
+          <TooltipWrapper label="Send to back" side="bottom">
+            <Button variant="board" size="icon" onClick={moveToBack}>
+              <SendToBackIcon />
+            </Button>
+          </TooltipWrapper>
+        </div>
         <div className="flex items-center pl-2 ml-2 border-l border-neutral-200">
           <TooltipWrapper label="Delete">
             <Button variant="board" size="icon" onClick={deleteLayers}>
