@@ -53,7 +53,7 @@ export type Camera = {
   y: number;
 };
 
-export type RectangleLater = {
+export type RectangleLayer = {
   type: LayerType.Rectangle;
   x: number;
   y: number;
@@ -63,7 +63,7 @@ export type RectangleLater = {
   value?: string;
 };
 
-export type EllipseLater = {
+export type EllipseLayer = {
   type: LayerType.Ellipse;
   x: number;
   y: number;
@@ -73,7 +73,7 @@ export type EllipseLater = {
   value?: string;
 };
 
-export type PathLater = {
+export type PathLayer = {
   type: LayerType.Path;
   x: number;
   y: number;
@@ -84,7 +84,7 @@ export type PathLater = {
   value?: string;
 };
 
-export type TextLater = {
+export type TextLayer = {
   type: LayerType.Text;
   x: number;
   y: number;
@@ -94,7 +94,7 @@ export type TextLater = {
   value?: string;
 };
 
-export type NoteLater = {
+export type NoteLayer = {
   type: LayerType.Note;
   x: number;
   y: number;
@@ -130,3 +130,5 @@ export enum Side {
   Left = 4,
   Right = 8,
 }
+
+export type Layer = RectangleLayer | EllipseLayer | PathLayer | TextLayer | NoteLayer;

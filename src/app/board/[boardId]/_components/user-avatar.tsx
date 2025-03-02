@@ -10,7 +10,7 @@ interface UserAvatarProps {
 
 const UserAvatar = ({ borderColor, fallback, name, src }: UserAvatarProps) => {
   return (
-    <TooltipWrapper label={name || "Teammate"} side="bottom" sideOffset={18}>
+    <TooltipWrapper label={name || "Teammate"} side="bottom" sideOffset={14}>
       <Avatar className="size-8 border-2" style={{ borderColor: borderColor }}>
         <AvatarFallback className="text-xs font-semibold">
           {fallback}
