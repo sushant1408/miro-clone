@@ -89,7 +89,10 @@ const Canvas = ({ boardId }: CanvasProps) => {
         y: position.y,
         height: 100,
         width: 100,
-        fill: lastUsedColor,
+        fill:
+          layerType === LayerType.Note
+            ? { r: 255, g: 249, b: 177 }
+            : lastUsedColor,
       });
 
       liveLayerIds.push(layerId);
