@@ -1,5 +1,6 @@
 "use client";
 
+import { LiveObject } from "@liveblocks/client";
 import {
   useCanRedo,
   useCanUndo,
@@ -13,11 +14,14 @@ import { nanoid } from "nanoid";
 import {
   PointerEvent,
   useCallback,
+  useEffect,
   useMemo,
   useState,
   WheelEvent,
 } from "react";
 
+import { useDeleteLayers } from "@/hooks/use-delete-layers";
+import { useDisableScrollBounce } from "@/hooks/use-disable-scroll-bounce";
 import { MAX_LAYERS, SELECTION_NET_THRESHOLD } from "@/lib/constants";
 import {
   colorToCss,
@@ -37,7 +41,6 @@ import {
   Side,
   XYWH,
 } from "@/types/canvas";
-import { LiveObject } from "@liveblocks/client";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import { CursorsPresence } from "./cursors-presence";
 import { Info } from "./info";
@@ -47,6 +50,7 @@ import { Participants } from "./participants";
 import { SelectionBox } from "./selection-box";
 import { SelectionTools } from "./selection-tools";
 import { Toolbar } from "./toolbar";
+import { useEventListener } from "usehooks-ts";
 
 interface CanvasProps {
   boardId: Id<"boards">;
@@ -66,9 +70,12 @@ const Canvas = ({ boardId }: CanvasProps) => {
     b: 0,
   });
 
+  useDisableScrollBounce();
+
   const history = useHistory();
   const canUndo = useCanUndo();
   const canRedo = useCanRedo();
+  const deleteLayers = useDeleteLayers();
 
   const insertLayer = useMutation(
     (
@@ -390,6 +397,25 @@ const Canvas = ({ boardId }: CanvasProps) => {
 
     return layerIdsToColorSelection;
   }, [selections]);
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    switch (e.key) {
+      case "z":
+        if (e.ctrlKey || e.metaKey) {
+          if (e.shiftKey) {
+            history.redo();
+          } else {
+            history.undo();
+          }
+          break;
+        }
+      case "Backspace":
+        deleteLayers();
+        break;
+    }
+  };
+
+  useEventListener("keydown", onKeyDown);
 
   return (
     <main className="h-full w-full relative bg-neutral-100 touch-none">
