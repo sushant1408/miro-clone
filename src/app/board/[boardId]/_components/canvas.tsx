@@ -39,6 +39,7 @@ import { Info } from "./info";
 import { LayerPreview } from "./layer-preview";
 import { Participants } from "./participants";
 import { SelectionBox } from "./selection-box";
+import { SelectionTools } from "./selection-tools";
 import { Toolbar } from "./toolbar";
 
 const MAX_LAYERS = 100;
@@ -275,6 +276,7 @@ const Canvas = ({ boardId }: CanvasProps) => {
         redo={history.redo}
         undo={history.undo}
       />
+      <SelectionTools camera={camera} setLastUsedColor={setLastUsedColor} />
 
       <svg
         className="h-[100vh] w-[100vw]"
